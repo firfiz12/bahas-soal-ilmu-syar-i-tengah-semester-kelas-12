@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Try Out Aqidah & Fiqh Nikah — 100 Soal</title>
+<style>
+:root {
+  --bg:#f5f7fb; --card:#ffffff; --text:#172033; --muted:#6b7280;
+  --primary:#1d4ed8; --primary2:#2563eb; --good:#15803d; --bad:#b91c1c;
+  --border:#dbe2ea; --shadow:0 12px 32px rgba(15,23,42,.08);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Segoe UI","Noto Naskh Arabic","Tahoma",Arial,sans-serif}
+header{background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;padding:28px 18px}
+.container{max-width:920px;margin:auto}
+h1{margin:0 0 8px;font-size:30px}
+.subtitle{opacity:.92;font-size:16px}
+.topbar{position:sticky;top:0;z-index:5;background:rgba(245,247,251,.95);backdrop-filter:blur(8px);padding:14px 0;border-bottom:1px solid var(--border)}
+.topbar-inner{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.progress-wrap{flex:1;min-width:240px}
+.progress-text{font-size:14px;color:var(--muted);margin-bottom:6px}
+.progress{height:10px;background:#e5e7eb;border-radius:999px;overflow:hidden}
+.progress > div{height:100%;width:0;background:linear-gradient(90deg,var(--primary),#60a5fa);transition:width .25s}
+.timer{font-weight:700;padding:9px 12px;background:#fff;border:1px solid var(--border);border-radius:10px}
+.card{background:var(--card);box-shadow:var(--shadow);border:1px solid var(--border);border-radius:18px;padding:26px;margin:28px 0}
+.badge{display:inline-block;font-size:13px;font-weight:700;color:var(--primary);background:#dbeafe;padding:6px 10px;border-radius:999px;margin-bottom:12px}
+.question{font-size:23px;line-height:1.9;font-weight:700;margin:0 0 20px}
+.option{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--border);padding:13px 14px;border-radius:12px;margin:10px 0;cursor:pointer;transition:.15s;background:#fff}
+.option:hover{border-color:#93c5fd;background:#eff6ff}
+.option input{margin-top:7px;transform:scale(1.15)}
+.option-text{font-size:18px;line-height:1.8}
+.nav{display:flex;gap:10px;justify-content:space-between;margin-top:22px}
+button{border:0;border-radius:12px;padding:12px 18px;font-weight:700;font-size:15px;cursor:pointer}
+.btn-secondary{background:#e5e7eb;color:#111827}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary2)}
+.btn-finish{background:#111827;color:#fff}
+.hidden{display:none!important}
+.result{text-align:center}
+.score{font-size:56px;font-weight:800;color:var(--primary);margin:4px 0}
+.result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:24px 0}
+.stat{border:1px solid var(--border);border-radius:14px;padding:16px;background:#fafafa}
+.stat b{display:block;font-size:26px}
+.review{text-align:right;margin-top:28px}
+.review-item{border:1px solid var(--border);border-radius:14px;padding:16px;margin:10px 0;background:#fff}
+.review-item.correct{border-right:5px solid var(--good)}
+.review-item.wrong{border-right:5px solid var(--bad)}
+.small{font-size:14px;color:var(--muted)}
+footer{padding:30px 0 50px;color:var(--muted);font-size:13px;text-align:center}
+@media(max-width:700px){
+ h1{font-size:24px} .question{font-size:20px} .option-text{font-size:16px}
+ .card{padding:18px} .result-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="container">
+    <h1>تَجْرِبَةُ اخْتِبَارٍ — الْعَقِيدَةُ وَفِقْهُ النِّكَاحِ</h1>
+    <div class="subtitle">١٠٠ سُؤَالًا • ٥٠ اخْتِيَارًا مِنْ مُتَعَدِّدٍ • ٥٠ صَوَابًا وَخَطَأً</div>
+  </div>
+</header>
+
+<div class="topbar">
+  <div class="container topbar-inner">
+    <div class="progress-wrap">
+      <div class="progress-text" id="progressText">السؤال ١ من ١٠٠</div>
+      <div class="progress"><div id="progressBar"></div></div>
+    </div>
+    <div class="timer" id="timer">الوقت: ٠٠:٠٠</div>
+  </div>
+</div>
+
+<main class="container">
+  <section id="quizCard" class="card">
+    <div id="badge" class="badge"></div>
+    <h2 id="question" class="question"></h2>
+    <div id="options"></div>
+    <div class="nav">
+      <button id="prevBtn" class="btn-secondary">السابق</button>
+      <div>
+        <button id="nextBtn" class="btn-primary">التالي</button>
+        <button id="finishBtn" class="btn-finish hidden">إنهاء الاختبار</button>
+      </div>
+    </div>
+    <p class="small" style="margin-top:16px">اختر إجابة واحدة لكل سؤال. يمكنك الرجوع إلى السؤال السابق قبل إنهاء الاختبار.</p>
+  </section>
+
+  <section id="resultCard" class="card result hidden">
+    <div class="badge">النَّتِيجَةُ النِّهَائِيَّةُ</div>
+    <h2>أَحْسَنْتَ! أَتْمَمْتَ الِاخْتِبَارَ.</h2>
+    <div class="score" id="score">0%</div>
+    <div class="result-grid">
+      <div class="stat"><span>الإجابات الصحيحة</span><b id="correctCount">0</b></div>
+      <div class="stat"><span>الإجابات الخاطئة</span><b id="wrongCount">0</b></div>
+      <div class="stat"><span>غير المجاب عنها</span><b id="blankCount">0</b></div>
+    </div>
+    <p id="resultMessage" style="font-size:18px"></p>
+    <div class="review">
+      <h3>مُرَاجَعَةُ الْأَسْئِلَةِ الْخَاطِئَةِ وَغَيْرِ الْمُجَابَةِ</h3>
+      <div id="reviewList"></div>
+    </div>
+    <button onclick="restartQuiz()" class="btn-primary" style="margin-top:16px">إعادة الاختبار</button>
+  </section>
+</main>
+
+<footer>
+  اختبار مراجعة مبني على مواد العقيدة وفقه النكاح المستخدمة في الدروس.
+</footer>
+
+<script>
+const questions = [{"type": "mcq", "q": "مَا مَعْنَى شَهَادَةِ أَنَّ مُحَمَّدًا رَسُولُ اللَّهِ ﷺ؟", "options": ["تَصْدِيقُهُ فِيمَا أَخْبَرَ، وَطَاعَتُهُ فِيمَا أَمَرَ", "مَحَبَّتُهُ فَقَطْ مِنْ غَيْرِ اتِّبَاعٍ", "تَصْدِيقُهُ فِي بَعْضِ مَا أَخْبَرَ", "تَقْدِيمُ كَلَامِ النَّاسِ عَلَى كَلَامِهِ"], "answer": 0, "section": "الاختيار من متعدد", "num": 1}, {"type": "mcq", "q": "مَا الَّذِي يُنَافِي مَعْنَى شَهَادَةِ أَنَّ مُحَمَّدًا رَسُولُ اللَّهِ ﷺ؟", "options": ["اجْتِنَابُ مَا نَهَى عَنْهُ", "اتِّبَاعُهُ فِيمَا جَاءَ بِهِ", "عِبَادَةُ اللَّهِ بِغَيْرِ مَا شَرَعَ", "تَصْدِيقُهُ فِيمَا أَخْبَرَ"], "answer": 2, "section": "الاختيار من متعدد", "num": 2}, {"type": "mcq", "q": "كَيْفَ يَجِبُ تَحْقِيقُ هَذِهِ الشَّهَادَةِ؟", "options": ["مَعْرِفَةً فَقَطْ", "إِقْرَارًا فَقَطْ", "مَعْرِفَةً وَإِقْرَارًا وَانْقِيَادًا ظَاهِرًا وَبَاطِنًا", "انْقِيَادًا بَاطِنًا فَقَطْ"], "answer": 2, "section": "الاختيار من متعدد", "num": 3}, {"type": "mcq", "q": "مَا مَضْمُونُ الشَّهَادَتَيْنِ كَمَا جَاءَ فِي الدَّرْسِ؟", "options": ["أَنْ نَعْبُدَ اللَّهَ بِمَا شَرَعَ عَلَى لِسَانِ رَسُولِهِ ﷺ", "أَنْ نَعْبُدَ اللَّهَ بِمَا نَرَاهُ مُنَاسِبًا", "أَنْ نَتْرُكَ جَمِيعَ السُّنَنِ", "أَنْ نَتَّبِعَ آراءَ الْعُلَمَاءِ دُونَ دَلِيلٍ"], "answer": 0, "section": "الاختيار من متعدد", "num": 4}, {"type": "mcq", "q": "كَمْ مِنْ مَوْضِعٍ فِي الْقُرْآنِ أَمَرَ اللَّهُ فِيهِ بِطَاعَةِ رَسُولِهِ ﷺ؟", "options": ["أَقَلَّ مِنْ عَشَرَةِ مَوَاضِعَ", "أَكْثَرَ مِنْ ثَلَاثِينَ مَوْضِعًا", "عَشَرَةَ مَوَاضِعَ فَقَطْ", "خَمْسِينَ مَوْضِعًا فَقَطْ"], "answer": 1, "section": "الاختيار من متعدد", "num": 5}, {"type": "mcq", "q": "بِمَاذَا جَعَلَ اللَّهُ رَسُولَهُ ﷺ أُسْوَةً وَقُدْوَةً؟", "options": ["فِي الْأَقْوَالِ فَقَطْ", "فِي الْأَفْعَالِ فَقَطْ", "فِي أَقْوَالِهِ وَأَفْعَالِهِ وَجَمِيعِ مَا جَاءَ بِهِ", "فِي لِبَاسِهِ فَقَطْ"], "answer": 2, "section": "الاختيار من متعدد", "num": 6}, {"type": "mcq", "q": "مَا مَعْنَى مَحَبَّةِ الْمُسْلِمِ لِلنَّبِيِّ ﷺ؟", "options": ["مَيْلُ الْقَلْبِ إِلَيْهِ مَعَ إِيثَارِهِ عَلَى كُلِّ مَحْبُوبٍ سِوَى اللَّهِ", "كَثْرَةُ ذِكْرِ اسْمِهِ فَقَطْ", "مَحَبَّةُ أَقْوَالِهِ دُونَ أَفْعَالِهِ", "مَحَبَّتُهُ أَقَلَّ مِنْ مَحَبَّةِ النَّاسِ"], "answer": 0, "section": "الاختيار من متعدد", "num": 7}, {"type": "mcq", "q": "كَمْ دَرَجَةً لِمَحَبَّةِ النَّبِيِّ ﷺ فِي الدَّرْسِ؟", "options": ["دَرَجَةٌ وَاحِدَةٌ", "دَرَجَتَانِ", "ثَلَاثُ دَرَجَاتٍ", "أَرْبَعُ دَرَجَاتٍ"], "answer": 1, "section": "الاختيار من متعدد", "num": 8}, {"type": "mcq", "q": "مَا الْمَحَبَّةُ الَّتِي تَكُونُ فَرْضًا؟", "options": ["الْمَحَبَّةُ الَّتِي تَقْتَضِي قَبُولَ مَا جَاءَ بِهِ الرَّسُولُ ﷺ وَاتِّبَاعَهُ", "الْمَحَبَّةُ الَّتِي تَقْتَضِي التَّشَبُّهَ بِهِ فِي لِبَاسِهِ فَقَطْ", "الْمَحَبَّةُ الَّتِي تَقْتَضِي كَثْرَةَ النَّوَافِلِ فَقَطْ", "الْمَحَبَّةُ الَّتِي تَقْتَضِي مَحَبَّةَ النَّاسِ كُلِّهِمْ"], "answer": 0, "section": "الاختيار من متعدد", "num": 9}, {"type": "mcq", "q": "أَيُّ الْآتِي مِنْ مَظَاهِرِ دَرَجَةِ الْمَحَبَّةِ السُّنِّيَّةِ؟", "options": ["فِعْلُ الْوَاجِبَاتِ فَقَطْ", "حُسْنُ التَّأَسِّي بِهِ فِي أَخْلَاقِهِ وَآدَابِهِ وَنَوَافِلِهِ", "تَرْكُ سُنَّتِهِ", "مُخَالَفَةُ هَدْيِهِ"], "answer": 1, "section": "الاختيار من متعدد", "num": 10}, {"type": "mcq", "q": "مَنْ أَحَبَّ النَّبِيَّ ﷺ فَمِنْ عَلَامَاتِ مَحَبَّتِهِ:", "options": ["تَرْكُ الصَّلَاةِ عَلَيْهِ", "اتِّبَاعُهُ وَالِاقْتِدَاءُ بِهِ", "تَرْكُ سُنَّتِهِ", "تَقْدِيمُ قَوْلِ غَيْرِهِ عَلَيْهِ"], "answer": 1, "section": "الاختيار من متعدد", "num": 11}, {"type": "mcq", "q": "مَاذَا يَكُونُ لِمَنْ صَلَّى عَلَى النَّبِيِّ ﷺ وَاحِدَةً؟", "options": ["صَلَّى اللَّهُ عَلَيْهِ وَاحِدَةً", "صَلَّى اللَّهُ عَلَيْهِ اثْنَتَيْنِ", "صَلَّى اللَّهُ عَلَيْهِ عَشْرًا", "صَلَّى اللَّهُ عَلَيْهِ مِائَةً"], "answer": 2, "section": "الاختيار من متعدد", "num": 12}, {"type": "mcq", "q": "مِنْ عَلَامَاتِ مَحَبَّةِ النَّبِيِّ ﷺ أَنْ يَتَمَنَّى الْمُسْلِمُ:", "options": ["كَثْرَةَ الْمَالِ فَقَطْ", "رُؤْيَتَهُ وَالشَّوْقَ إِلَى لِقَائِهِ", "تَرْكَ الْقُرْآنِ", "مُخَالَفَةَ سُنَّتِهِ"], "answer": 1, "section": "الاختيار من متعدد", "num": 13}, {"type": "mcq", "q": "مَا الَّذِي يُعِينُ عَلَى مَحَبَّةِ النَّبِيِّ ﷺ؟", "options": ["تَرْكُ الْقُرْآنِ", "تَعَلُّمُ الْقُرْآنِ وَالْمُدَاوَمَةُ عَلَى تِلَاوَتِهِ وَفَهْمِ مَعَانِيهِ", "تَرْكُ الصَّلَاةِ عَلَيْهِ", "الْإِعْرَاضُ عَنْ سِيرَتِهِ"], "answer": 1, "section": "الاختيار من متعدد", "num": 14}, {"type": "mcq", "q": "مِنْ دَوَاعِي مَحَبَّةِ الرَّسُولِ ﷺ أَنَّ حُبَّنَا لَهُ:", "options": ["مُنْفَصِلٌ عَنْ حُبِّنَا لِلَّهِ", "تَابِعٌ لِحُبِّنَا لِلَّهِ", "أَقَلُّ مِنْ حُبِّنَا لِلنَّاسِ", "لَا عَلاقَةَ لَهُ بِالْإِيمَانِ"], "answer": 1, "section": "الاختيار من متعدد", "num": 15}, {"type": "mcq", "q": "مِنْ أَسْبَابِ مَحَبَّةِ النَّبِيِّ ﷺ:", "options": ["رَحْمَتُهُ بِأُمَّتِهِ وَحِرْصُهُ عَلَى هِدَايَتِهَا", "انْشِغَالُهُ بِالدُّنْيَا", "إِعْرَاضُهُ عَنِ النَّاسِ", "تَرْكُهُ نَصْحَ أُمَّتِهِ"], "answer": 0, "section": "الاختيار من متعدد", "num": 16}, {"type": "mcq", "q": "مِنْ مَظَاهِرِ يُسْرِ الشَّرِيعَةِ الْإِسْلَامِيَّةِ:", "options": ["عَدَمُ وُجُودِ الْمَذَاهِبِ الْفِقْهِيَّةِ", "وُجُودُ الْمَذَاهِبِ الْإِسْلَامِيَّةِ الْفِقْهِيَّةِ", "اخْتِلَافُ أُصُولِ الْإِسْلَامِ", "تَنَاقُضُ الْقُرْآنِ وَالسُّنَّةِ"], "answer": 1, "section": "الاختيار من متعدد", "num": 17}, {"type": "mcq", "q": "مِنْ أَسْبَابِ نُشُوءِ الْمَذَاهِبِ الْفِقْهِيَّةِ:", "options": ["اخْتِلَافُ وِجْهَاتِ نَظَرِ الْعُلَمَاءِ فِي فَهْمِ النُّصُوصِ", "اخْتِلَافُ الْقُرْآنِ فِي نَفْسِهِ", "تَنَاقُضُ السُّنَّةِ مَعَ السُّنَّةِ", "قِلَّةُ الْعُلَمَاءِ فِي كُلِّ الْعُصُورِ"], "answer": 0, "section": "الاختيار من متعدد", "num": 18}, {"type": "mcq", "q": "لِمَاذَا تَفَاوَتَ الْعُلَمَاءُ فِي مَعْرِفَةِ حَدِيثِ رَسُولِ اللَّهِ ﷺ؟", "options": ["لِأَنَّ الصَّحَابَةَ كَانُوا مُجْتَمِعِينَ فِي مَكَانٍ وَاحِدٍ", "لِتَفَرُّقِ الصَّحَابَةِ فِي الْبِلَادِ", "لِعَدَمِ وُجُودِ الْأَحَادِيثِ", "لِقِلَّةِ اللُّغَةِ الْعَرَبِيَّةِ"], "answer": 1, "section": "الاختيار من متعدد", "num": 19}, {"type": "mcq", "q": "مَا الَّذِي سَاعَدَ عَلَى اخْتِلَافِ الْعُلَمَاءِ فِي فَهْمِ بَعْضِ النُّصُوصِ؟", "options": ["ضِيقُ اللُّغَةِ الْعَرَبِيَّةِ", "اتِّسَاعُ اللُّغَةِ الْعَرَبِيَّةِ وَكَثْرَةُ مَعَانِي كَلِمَاتِهَا", "عَدَمُ وُجُودِ النُّصُوصِ", "قِلَّةُ مَعَانِي الْكَلِمَاتِ"], "answer": 1, "section": "الاختيار من متعدد", "num": 20}, {"type": "mcq", "q": "كَمْ مِنَ الْمَذَاهِبِ الْفِقْهِيَّةِ اشْتَهَرَتْ بَقَاءً وَانْتِشَارًا؟", "options": ["اثْنَانِ", "ثَلَاثَةٌ", "أَرْبَعَةٌ", "خَمْسَةٌ"], "answer": 2, "section": "الاختيار من متعدد", "num": 21}, {"type": "mcq", "q": "مَنْ هُوَ إِمَامُ الْمَذْهَبِ الْحَنَفِيِّ؟", "options": ["مَالِكُ بْنُ أَنَسٍ", "أَحْمَدُ بْنُ حَنْبَلٍ", "أَبُو حَنِيفَةَ النُّعْمَانُ بْنُ ثَابِتٍ", "مُحَمَّدُ بْنُ إِدْرِيسَ الشَّافِعِيُّ"], "answer": 2, "section": "الاختيار من متعدد", "num": 22}, {"type": "mcq", "q": "مَنْ هُوَ إِمَامُ الْمَذْهَبِ الشَّافِعِيِّ؟", "options": ["أَبُو حَنِيفَةَ", "مَالِكُ بْنُ أَنَسٍ", "مُحَمَّدُ بْنُ إِدْرِيسَ الشَّافِعِيُّ", "أَحْمَدُ بْنُ حَنْبَلٍ"], "answer": 2, "section": "الاختيار من متعدد", "num": 23}, {"type": "mcq", "q": "مَا الْقَاعِدَةُ الَّتِي اتَّفَقَ عَلَيْهَا أَئِمَّةُ الْمَذَاهِبِ؟", "options": ["لَا اجْتِهَادَ إِلَّا مَعَ وُجُودِ النَّصِّ", "لَا مَسَاغَ لِلِاجْتِهَادِ فِي مَوْرِدِ النَّصِّ", "تَرْكُ الْحَدِيثِ عِنْدَ وُجُودِ الرَّأْيِ", "تَقْدِيمُ الْمَذْهَبِ عَلَى الْحَدِيثِ"], "answer": 1, "section": "الاختيار من متعدد", "num": 24}, {"type": "mcq", "q": "مَاذَا يَفْعَلُ الْمُسْلِمُ الَّذِي لَيْسَ لَهُ أَهْلِيَّةُ الِاجْتِهَادِ؟", "options": ["يَتْرُكُ السُّؤَالَ", "يَجْتَهِدُ فِي كُلِّ مَسْأَلَةٍ بِنَفْسِهِ", "يَسْأَلُ أَهْلَ الْعِلْمِ", "يَأْخُذُ بِأَيِّ قَوْلٍ مِنْ غَيْرِ سُؤَالٍ"], "answer": 2, "section": "الاختيار من متعدد", "num": 25}, {"type": "mcq", "q": "مَا مَعْنَى النِّكَاحِ فِي اللُّغَةِ؟", "options": ["الْبَيْعُ وَالشِّرَاءُ", "الضَّمُّ وَالْجَمْعُ", "السَّفَرُ وَالِارْتِحَالُ", "الْفِرَاقُ وَالطَّلَاقُ"], "answer": 1, "section": "الاختيار من متعدد", "num": 26}, {"type": "mcq", "q": "مَا مَعْنَى النِّكَاحِ اصْطِلَاحًا؟", "options": ["عَقْدٌ عَلَى امْرَأَةٍ يَتَضَمَّنُ إِبَاحَةَ الِاسْتِمْتَاعِ بِهَا وَحُصُولَ الْوَلَدِ وَسَائِرَ مَصَالِحِ النِّكَاحِ", "عَقْدُ الْبَيْعِ عَلَى مَالٍ", "عَقْدٌ لِطَلَاقِ الْمَرْأَةِ", "عَقْدٌ لِلتَّعَاوُنِ فَقَطْ"], "answer": 0, "section": "الاختيار من متعدد", "num": 27}, {"type": "mcq", "q": "مَا الْأَصْلُ فِي حُكْمِ النِّكَاحِ؟", "options": ["وَاجِبٌ دَائِمًا", "سُنَّةٌ مُؤَكَّدَةٌ", "مَكْرُوهٌ دَائِمًا", "حَرَامٌ دَائِمًا"], "answer": 1, "section": "الاختيار من متعدد", "num": 28}, {"type": "mcq", "q": "مَتَى يَكُونُ النِّكَاحُ وَاجِبًا؟", "options": ["إِذَا خَافَ الشَّخْصُ الْوُقُوعَ فِي الْحَرَامِ كَالزِّنَا", "إِذَا لَمْ يَكُنْ لَهُ قُدْرَةٌ عَلَى النَّفَقَةِ", "إِذَا لَمْ يَكُنْ لَهُ رَغْبَةٌ فِي النِّكَاحِ", "إِذَا كَانَ لَا يَسْتَطِيعُ قِيَامَ حُقُوقِ الزَّوْجَةِ"], "answer": 0, "section": "الاختيار من متعدد", "num": 29}, {"type": "mcq", "q": "مَتَى يَكُونُ النِّكَاحُ مُسْتَحَبًّا؟", "options": ["إِذَا أَرَادَ النِّكَاحَ وَقَدَرَ عَلَى نَفَقَتِهِ وَلَا يَخَافُ الزِّنَا", "إِذَا كَانَ لَا يَقْدِرُ عَلَى النَّفَقَةِ", "إِذَا كَانَ سَيُضَيِّعُ حَقَّ زَوْجَتِهِ", "إِذَا لَمْ يَكُنْ لَهُ رَغْبَةٌ فِي النِّكَاحِ"], "answer": 0, "section": "الاختيار من متعدد", "num": 30}, {"type": "mcq", "q": "مَتَى يَكُونُ النِّكَاحُ مَكْرُوهًا؟", "options": ["إِذَا خَافَ الزِّنَا", "إِذَا كَانَ قَادِرًا عَلَى النَّفَقَةِ", "إِذَا كَانَ سَيَعْجِزُ عَنْ أَدَاءِ حُقُوقِ الزَّوْجَةِ", "إِذَا أَرَادَ النِّكَاحَ وَلَمْ يَخَفِ الزِّنَا"], "answer": 2, "section": "الاختيار من متعدد", "num": 31}, {"type": "mcq", "q": "مَتَى يَكُونُ النِّكَاحُ مُبَاحًا؟", "options": ["إِذَا عَدِمَ الرَّجُلُ الشَّهْوَةَ وَلَمْ يَضُرَّ زَوْجَتَهُ", "إِذَا خَافَ الزِّنَا", "إِذَا عَجَزَ عَنْ أَدَاءِ حُقُوقِهَا", "إِذَا مَنَعَ زَوْجَتَهَا مِنْ حُقُوقِهَا"], "answer": 0, "section": "الاختيار من متعدد", "num": 32}, {"type": "mcq", "q": "أَيُّ الْآتِي مِنْ أَرْكَانِ النِّكَاحِ؟", "options": ["الْمَهْرُ فَقَطْ", "الزَّوْجَانِ وَالْإِيجَابُ وَالْقَبُولُ", "الْوَلِيمَةُ وَالْخُطْبَةُ", "السُّكُونُ وَالنَّفَقَةُ"], "answer": 1, "section": "الاختيار من متعدد", "num": 33}, {"type": "mcq", "q": "مَنْ يَقُولُ عَادَةً: «زَوَّجْتُكَ» أَوْ «أَنْكَحْتُكَ»؟", "options": ["الزَّوْجُ", "الشَّاهِدُ", "الْوَلِيُّ", "الزَّوْجَةُ"], "answer": 2, "section": "الاختيار من متعدد", "num": 34}, {"type": "mcq", "q": "مَنْ يَقُولُ: «قَبِلْتُ هَذَا الزَّوَاجَ»؟", "options": ["الْوَلِيُّ", "الزَّوْجُ", "الشَّاهِدُ الْأَوَّلُ", "أَحَدُ أَقَارِبِ الزَّوْجَةِ"], "answer": 1, "section": "الاختيار من متعدد", "num": 35}, {"type": "mcq", "q": "إِذَا كَانَ الشَّخْصُ أَخْرَسَ، فَكَيْفَ يَكُونُ الْإِيجَابُ أَوِ الْقَبُولُ؟", "options": ["لَا يَصِحُّ أَبَدًا", "بِالْإِشَارَةِ الْمَفْهُومَةِ أَوِ الْكِتَابَةِ", "بِالصَّمْتِ فَقَطْ", "بِالْحُضُورِ فَقَطْ"], "answer": 1, "section": "الاختيار من متعدد", "num": 36}, {"type": "mcq", "q": "مَا الشَّرْطُ الْمُتَعَلِّقُ بِتَعْيِينِ الزَّوْجَيْنِ؟", "options": ["أَنْ يَقُولَ الْوَلِيُّ: زَوَّجْتُكَ إِحْدَى بَنَاتِي", "أَنْ يَكُونَ كُلُّ وَاحِدٍ مِنَ الزَّوْجَيْنِ مُعَيَّنًا", "أَنْ يَكُونَ أَحَدُهُمَا مَجْهُولًا", "أَنْ يُتْرَكَ الِاخْتِيَارُ لِلشُّهُودِ"], "answer": 1, "section": "الاختيار من متعدد", "num": 37}, {"type": "mcq", "q": "مَا حُكْمُ قَوْلِ الْوَلِيِّ: «زَوَّجْتُكَ إِحْدَى بَنَاتِي» مِنْ جِهَةِ تَعْيِينِ الزَّوْجَةِ؟", "options": ["مُسْتَحَبٌّ", "مُبَاحٌ", "لَا يَتَحَقَّقُ فِيهِ شَرْطُ تَعْيِينِ الزَّوْجَيْنِ", "سُنَّةٌ"], "answer": 2, "section": "الاختيار من متعدد", "num": 38}, {"type": "mcq", "q": "مَا الْمَقْصُودُ بِرِضَا الزَّوْجَيْنِ؟", "options": ["أَنْ يَكُونَ أَحَدُهُمَا مُكْرَهًا", "أَنْ يَكُونَ كِلَاهُمَا رَاضِيًا عَنِ النِّكَاحِ", "أَنْ يَرْضَى الْوَلِيُّ فَقَطْ", "أَنْ يَرْضَى الشُّهُودُ فَقَطْ"], "answer": 1, "section": "الاختيار من متعدد", "num": 39}, {"type": "mcq", "q": "مَا دَلَالَةُ سُكُوتِ الْبِكْرِ عِنْدَ الِاسْتِئْذَانِ؟", "options": ["دَلِيلٌ عَلَى عَدَمِ الرِّضَا", "لَا يَدُلُّ عَلَى شَيْءٍ", "يَدُلُّ عَلَى رِضَاهَا", "يَدُلُّ عَلَى رَفْضِ النِّكَاحِ"], "answer": 2, "section": "الاختيار من متعدد", "num": 40}, {"type": "mcq", "q": "مَا أَصْلُ شَرْطِ الْوِلَايَةِ فِي النِّكَاحِ؟", "options": ["«لَا نِكَاحَ إِلَّا بِوَلِيٍّ»", "«لَا بَيْعَ إِلَّا بِشَاهِدَيْنِ»", "«إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ»", "«الْمُسْلِمُ أَخُو الْمُسْلِمِ»"], "answer": 0, "section": "الاختيار من متعدد", "num": 41}, {"type": "mcq", "q": "مَنْ أَقْرَبُ الْأَوْلِيَاءِ فِي التَّرْتِيبِ الْمَذْكُورِ؟", "options": ["الْعَمُّ", "الْأَخُ الشَّقِيقُ", "الْأَبُ", "ابْنُ الْأَخِ"], "answer": 2, "section": "الاختيار من متعدد", "num": 42}, {"type": "mcq", "q": "مَا الشَّرْطُ فِي الْوَلِيِّ مِنْ حَيْثُ أَهْلِيَّتُهُ؟", "options": ["أَنْ يَكُونَ طِفْلًا", "أَنْ يَكُونَ مُكَلَّفًا وَرَشِيدًا", "أَنْ يَكُونَ فَقِيرًا", "أَنْ يَكُونَ غَيْرَ رَاشِدٍ"], "answer": 1, "section": "الاختيار من متعدد", "num": 43}, {"type": "mcq", "q": "مَا وَاجِبُ الْوَلِيِّ نَحْوَ الْمَرْأَةِ؟", "options": ["أَنْ يَمْنَعَهَا دَائِمًا مِنَ الزَّوَاجِ", "أَنْ يَحْفَظَ مَصْلَحَتَهَا", "أَنْ يُزَوِّجَهَا لِأَيِّ رَجُلٍ", "أَنْ يَتْرُكَهَا بِلَا زَوَاجٍ"], "answer": 1, "section": "الاختيار من متعدد", "num": 44}, {"type": "mcq", "q": "مَا الَّذِي يَمْنَعُ الْوَلِيَّ مِنْ تَأْخِيرِ زَوَاجِ الْمَرْأَةِ؟", "options": ["إِذَا لَمْ يَكُنْ هُنَاكَ سَبَبٌ شَرْعِيٌّ", "إِذَا كَانَ الزَّوْجُ مُوَافِقًا", "إِذَا رَضِيَتِ الْمَرْأَةُ", "إِذَا وُجِدَ شَاهِدَانِ"], "answer": 0, "section": "الاختيار من متعدد", "num": 45}, {"type": "mcq", "q": "كَمْ عَدَدُ الشُّهُودِ فِي شَرْطِ النِّكَاحِ؟", "options": ["شَاهِدٌ وَاحِدٌ", "شَاهِدَانِ", "ثَلَاثَةُ شُهُودٍ", "أَرْبَعَةُ شُهُودٍ"], "answer": 1, "section": "الاختيار من متعدد", "num": 46}, {"type": "mcq", "q": "مَا الْفَائِدَةُ مِنْ حُضُورِ الشَّاهِدَيْنِ؟", "options": ["أَنْ يَبْقَى النِّكَاحُ سِرًّا", "أَنْ يَكُونَ النِّكَاحُ مَعْرُوفًا وَمُعْلَنًا", "أَنْ يَكُونَ الْمَهْرُ كَبِيرًا", "أَنْ يُكْثِرَ النَّاسُ مِنَ الْأَكْلِ"], "answer": 1, "section": "الاختيار من متعدد", "num": 47}, {"type": "mcq", "q": "أَيُّ الْآتِي مِنْ سُنَنِ النِّكَاحِ وَآدَابِهِ؟", "options": ["كِتْمَانُ النِّكَاحِ", "الْوَلِيمَةُ وَإِعْلَانُ النِّكَاحِ", "تَرْكُ الدُّعَاءِ لِلزَّوْجَيْنِ", "إِخْفَاءُ الزَّوَاجِ عَنِ النَّاسِ"], "answer": 1, "section": "الاختيار من متعدد", "num": 48}, {"type": "mcq", "q": "مَا الدُّعَاءُ الْمَأْثُورُ لِلزَّوْجَيْنِ؟", "options": ["غَفَرَ اللَّهُ لَكَ وَرَحِمَكَ", "بَارَكَ اللَّهُ لَكَ، وَبَارَكَ عَلَيْكَ، وَجَمَعَ بَيْنَكُمَا فِي الْخَيْرِ", "اللَّهُمَّ ارْزُقْهُمَا الْمَالَ فَقَطْ", "اللَّهُمَّ أَصْلِحْ لَهُمَا الدُّنْيَا فَقَطْ"], "answer": 1, "section": "الاختيار من متعدد", "num": 49}, {"type": "mcq", "q": "مَاذَا يُسَنُّ أَنْ يَقُولَ الزَّوْجُ قَبْلَ الْجِمَاعِ؟", "options": ["الْحَمْدُ لِلَّهِ فَقَطْ", "بِسْمِ اللَّهِ، اللَّهُمَّ جَنِّبْنَا الشَّيْطَانَ...", "اللَّهُمَّ اغْفِرْ لِي فَقَطْ", "سُبْحَانَ اللَّهِ فَقَطْ"], "answer": 1, "section": "الاختيار من متعدد", "num": 50}, {"type": "tf", "q": "مَعْنَى شَهَادَةِ أَنَّ مُحَمَّدًا رَسُولُ اللَّهِ ﷺ هُوَ تَصْدِيقُهُ فِيمَا أَخْبَرَ وَطَاعَتُهُ فِيمَا أَمَرَ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 0, "section": "الصواب والخطأ", "num": 51}, {"type": "tf", "q": "يَكْفِي فِي تَحْقِيقِ شَهَادَةِ أَنَّ مُحَمَّدًا رَسُولُ اللَّهِ ﷺ مَعْرِفَتُهَا مِنْ غَيْرِ إِقْرَارٍ وَانْقِيَادٍ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 1, "section": "الصواب والخطأ", "num": 52}, {"type": "tf", "q": "يَجِبُ عَلَى الْمُسْلِمِ أَنْ يَعْبُدَ اللَّهَ بِمَا شَرَعَ عَلَى لِسَانِ رَسُولِهِ ﷺ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 0, "section": "الصواب والخطأ", "num": 53}, {"type": "tf", "q": "أَمَرَ اللَّهُ بِطَاعَةِ رَسُولِهِ ﷺ فِي أَكْثَرَ مِنْ ثَلَاثِينَ مَوْضِعًا مِنَ الْقُرْآنِ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 0, "section": "الصواب والخطأ", "num": 54}, {"type": "tf", "q": "جَعَلَ اللَّهُ رَسُولَهُ ﷺ أُسْوَةً وَقُدْوَةً فِي الْأَقْوَالِ فَقَطْ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 1, "section": "الصواب والخطأ", "num": 55}, {"type": "tf", "q": "مَحَبَّةُ النَّبِيِّ ﷺ مِنْ غَيْرِ اتِّبَاعِهِ كَافِيَةٌ لِتَمَامِ الْإِيمَانِ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 1, "section": "الصواب والخطأ", "num": 56}, {"type": "tf", "q": "مَحَبَّةُ النَّبِيِّ ﷺ عَلَى دَرَجَتَيْنِ: فَرْضٍ وَسُنَّةٍ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 0, "section": "الصواب والخطأ", "num": 57}, {"type": "tf", "q": "الْمَحَبَّةُ الْفَرْضِيَّةُ تَقْتَضِي قَبُولَ مَا جَاءَ بِهِ الرَّسُولُ ﷺ وَالِانْتِهَاءَ عَمَّا نَهَى عَنْهُ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 0, "section": "الصواب والخطأ", "num": 58}, {"type": "tf", "q": "مِنْ الْمَحَبَّةِ السُّنِّيَّةِ حُسْنُ التَّأَسِّي بِالنَّبِيِّ ﷺ فِي أَخْلَاقِهِ وَآدَابِهِ وَنَوَافِلِهِ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 0, "section": "الصواب والخطأ", "num": 59}, {"type": "tf", "q": "مِنْ عَلَامَاتِ مَحَبَّةِ النَّبِيِّ ﷺ تَرْكُ الصَّلَاةِ عَلَيْهِ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 1, "section": "الصواب والخطأ", "num": 60}, {"type": "tf", "q": "مَنْ صَلَّى عَلَى النَّبِيِّ ﷺ وَاحِدَةً صَلَّى اللَّهُ عَلَيْهِ عَشْرًا.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 0, "section": "الصواب والخطأ", "num": 61}, {"type": "tf", "q": "مِنْ عَلَامَاتِ مَحَبَّةِ النَّبِيِّ ﷺ تَمَنِّي رُؤْيَتِهِ وَالشَّوْقُ إِلَى لِقَائِهِ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 0, "section": "الصواب والخطأ", "num": 62}, {"type": "tf", "q": "مِنْ عَلَامَاتِ مَحَبَّةِ النَّبِيِّ ﷺ تَعَلُّمُ الْقُرْآنِ وَالْمُدَاوَمَةُ عَلَى تِلَاوَتِهِ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 0, "section": "الصواب والخطأ", "num": 63}, {"type": "tf", "q": "حُبُّ النَّبِيِّ ﷺ لَيْسَ لَهُ عَلاقَةٌ بِحُبِّ اللَّهِ تَعَالَى.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 1, "section": "الصواب والخطأ", "num": 64}, {"type": "tf", "q": "مِنْ دَوَاعِي مَحَبَّةِ النَّبِيِّ ﷺ رَأْفَتُهُ وَرَحْمَتُهُ بِأُمَّتِهِ وَحِرْصُهُ عَلَى هِدَايَتِهَا.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 0, "section": "الصواب والخطأ", "num": 65}, {"type": "tf", "q": "اخْتِلَافُ الْعُلَمَاءِ فِي فَهْمِ النُّصُوصِ أَحَدُ أَسْبَابِ نُشُوءِ الْمَذَاهِبِ الْفِقْهِيَّةِ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 0, "section": "الصواب والخطأ", "num": 66}, {"type": "tf", "q": "مِنْ أَسْبَابِ اخْتِلَافِ الْعُلَمَاءِ فِي الْحَدِيثِ تَفَرُّقُ الصَّحَابَةِ فِي الْبِلَادِ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 0, "section": "الصواب والخطأ", "num": 67}, {"type": "tf", "q": "ضِيقُ اللُّغَةِ الْعَرَبِيَّةِ مِنْ أَسْبَابِ اخْتِلَافِ الْفُقَهَاءِ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 1, "section": "الصواب والخطأ", "num": 68}, {"type": "tf", "q": "اشْتَهَرَ مِنَ الْمَذَاهِبِ الْفِقْهِيَّةِ أَرْبَعَةُ مَذَاهِبَ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 0, "section": "الصواب والخطأ", "num": 69}, {"type": "tf", "q": "إِمَامُ الْمَذْهَبِ الْمَالِكِيِّ هُوَ مُحَمَّدُ بْنُ إِدْرِيسَ الشَّافِعِيُّ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 1, "section": "الصواب والخطأ", "num": 70}, {"type": "tf", "q": "إِمَامُ الْمَذْهَبِ الْحَنْبَلِيِّ هُوَ أَحْمَدُ بْنُ حَنْبَلٍ الشَّيْبَانِيُّ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 0, "section": "الصواب والخطأ", "num": 71}, {"type": "tf", "q": "الْقَاعِدَةُ: «لَا مَسَاغَ لِلِاجْتِهَادِ فِي مَوْرِدِ النَّصِّ» مِنَ الْقَوَاعِدِ الَّتِي اتَّفَقَ عَلَيْهَا أَئِمَّةُ الْمَذَاهِبِ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 0, "section": "الصواب والخطأ", "num": 72}, {"type": "tf", "q": "كَانَ أَئِمَّةُ الْمَذَاهِبِ يَقْدِمُونَ أَقْوَالَهُمْ عَلَى الْحَدِيثِ الشَّرِيفِ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 1, "section": "الصواب والخطأ", "num": 73}, {"type": "tf", "q": "مَنْ لَيْسَتْ لَهُ أَهْلِيَّةُ الِاجْتِهَادِ يَسْأَلُ أَهْلَ الْعِلْمِ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 0, "section": "الصواب والخطأ", "num": 74}, {"type": "tf", "q": "اخْتِلَافُ الْأَئِمَّةِ فِي بَعْضِ الْأَحْكَامِ الْفِقْهِيَّةِ يُعَدُّ اخْتِلَافًا فِي أُصُولِ الدِّينِ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 1, "section": "الصواب والخطأ", "num": 75}, {"type": "tf", "q": "النِّكَاحُ فِي اللُّغَةِ هُوَ الضَّمُّ وَالْجَمْعُ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 0, "section": "الصواب والخطأ", "num": 76}, {"type": "tf", "q": "النِّكَاحُ فِي الِاصْطِلَاحِ عَقْدٌ عَلَى امْرَأَةٍ يَتَضَمَّنُ إِبَاحَةَ الِاسْتِمْتَاعِ بِهَا وَحُصُولَ الْوَلَدِ وَسَائِرَ مَصَالِحِ النِّكَاحِ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 0, "section": "الصواب والخطأ", "num": 77}, {"type": "tf", "q": "الْأَصْلُ فِي النِّكَاحِ أَنَّهُ حَرَامٌ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 1, "section": "الصواب والخطأ", "num": 78}, {"type": "tf", "q": "قَدْ يَكُونُ النِّكَاحُ وَاجِبًا أَوْ مُسْتَحَبًّا أَوْ مَكْرُوهًا أَوْ مُبَاحًا بِاخْتِلَافِ الْأَحْوَالِ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 0, "section": "الصواب والخطأ", "num": 79}, {"type": "tf", "q": "مَنْ خَافَ الْوُقُوعَ فِي الزِّنَا لَا يَكُونُ النِّكَاحُ فِي حَقِّهِ وَاجِبًا.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 1, "section": "الصواب والخطأ", "num": 80}, {"type": "tf", "q": "مَنْ أَرَادَ النِّكَاحَ وَقَدَرَ عَلَى نَفَقَتِهِ وَلَا يَخَافُ الزِّنَا فَالنِّكَاحُ فِي حَقِّهِ مُسْتَحَبٌّ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 0, "section": "الصواب والخطأ", "num": 81}, {"type": "tf", "q": "مَنْ كَانَ سَيَعْجِزُ عَنْ أَدَاءِ حُقُوقِ زَوْجَتِهِ فَالنِّكَاحُ فِي حَقِّهِ مَكْرُوهٌ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 0, "section": "الصواب والخطأ", "num": 82}, {"type": "tf", "q": "مَنْ لَا شَهْوَةَ لَهُ، وَلَا يَضُرُّ زَوْجَتَهُ، فَنِكَاحُهُ مُبَاحٌ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 0, "section": "الصواب والخطأ", "num": 83}, {"type": "tf", "q": "أَرْكَانُ النِّكَاحِ هِيَ الزَّوْجَانِ وَالْإِيجَابُ وَالْقَبُولُ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 0, "section": "الصواب والخطأ", "num": 84}, {"type": "tf", "q": "قَوْلُ الْوَلِيِّ: «زَوَّجْتُكَ» مِنْ أَلْفَاظِ الْقَبُولِ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 1, "section": "الصواب والخطأ", "num": 85}, {"type": "tf", "q": "قَوْلُ الزَّوْجِ: «قَبِلْتُ هَذَا الزَّوَاجَ» مِنْ أَلْفَاظِ الْقَبُولِ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 0, "section": "الصواب والخطأ", "num": 86}, {"type": "tf", "q": "يَسْتَطِيعُ الْأَخْرَسُ أَنْ يُعَبِّرَ عَنِ الْإِيجَابِ أَوِ الْقَبُولِ بِإِشَارَتِهِ الْمَفْهُومَةِ أَوْ بِالْكِتَابَةِ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 0, "section": "الصواب والخطأ", "num": 87}, {"type": "tf", "q": "مِنْ شُرُوطِ النِّكَاحِ تَعْيِينُ الزَّوْجَيْنِ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 0, "section": "الصواب والخطأ", "num": 88}, {"type": "tf", "q": "يَصِحُّ أَنْ يَقُولَ الْوَلِيُّ: «زَوَّجْتُكَ إِحْدَى بَنَاتِي» مِنْ غَيْرِ تَعْيِينٍ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 1, "section": "الصواب والخطأ", "num": 89}, {"type": "tf", "q": "مِنْ شُرُوطِ النِّكَاحِ رِضَا الزَّوْجَيْنِ إِذَا كَانَا عَاقِلَيْنِ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 0, "section": "الصواب والخطأ", "num": 90}, {"type": "tf", "q": "سُكُوتُ الْبِكْرِ عِنْدَ الِاسْتِئْذَانِ لَا يُعَدُّ رِضًا.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 1, "section": "الصواب والخطأ", "num": 91}, {"type": "tf", "q": "مِنْ شُرُوطِ النِّكَاحِ وُجُودُ الْوَلِيِّ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 0, "section": "الصواب والخطأ", "num": 92}, {"type": "tf", "q": "يُشْتَرَطُ فِي الْوَلِيِّ أَنْ يَكُونَ مُكَلَّفًا وَرَشِيدًا.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 0, "section": "الصواب والخطأ", "num": 93}, {"type": "tf", "q": "مِنْ وَاجِبَاتِ الْوَلِيِّ أَنْ يَحْفَظَ مَصْلِحَةَ الْمَرْأَةِ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 0, "section": "الصواب والخطأ", "num": 94}, {"type": "tf", "q": "يَجُوزُ لِلْوَلِيِّ أَنْ يَمْنَعَ الْمَرْأَةَ مِنَ الزَّوَاجِ بِغَيْرِ سَبَبٍ شَرْعِيٍّ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 1, "section": "الصواب والخطأ", "num": 95}, {"type": "tf", "q": "مِنْ شُرُوطِ النِّكَاحِ شَهَادَةُ شَاهِدَيْنِ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 0, "section": "الصواب والخطأ", "num": 96}, {"type": "tf", "q": "الْمَقْصُودُ مِنْ وُجُودِ الشَّاهِدَيْنِ أَنْ يَبْقَى النِّكَاحُ سِرًّا.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 1, "section": "الصواب والخطأ", "num": 97}, {"type": "tf", "q": "مِنْ سُنَنِ النِّكَاحِ الْوَلِيمَةُ وَإِعْلَانُ النِّكَاحِ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 0, "section": "الصواب والخطأ", "num": 98}, {"type": "tf", "q": "مِنَ الْأَدَبِ أَلَّا يُفْشِيَ الزَّوْجَانِ أَسْرَارَ الْحَيَاةِ الزَّوْجِيَّةِ.", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 0, "section": "الصواب والخطأ", "num": 99}, {"type": "tf", "q": "مِنَ الدُّعَاءِ لِلزَّوْجَيْنِ: «بَارَكَ اللَّهُ لَكَ، وَبَارَكَ عَلَيْكَ، وَجَمَعَ بَيْنَكُمَا فِي الْخَيْرِ».", "options": ["صَحِيحٌ", "خَطَأٌ"], "answer": 0, "section": "الصواب والخطأ", "num": 100}];
+let current = 0;
+let answers = Array(questions.length).fill(null);
+let startedAt = Date.now();
+let timerInterval = null;
+
+const toArabicDigits = s => String(s).replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[d]);
+const progressText = document.getElementById("progressText");
+const progressBar = document.getElementById("progressBar");
+const badge = document.getElementById("badge");
+const questionEl = document.getElementById("question");
+const optionsEl = document.getElementById("options");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+const finishBtn = document.getElementById("finishBtn");
+const quizCard = document.getElementById("quizCard");
+const resultCard = document.getElementById("resultCard");
+
+function renderQuestion() {
+  const q = questions[current];
+  badge.textContent = `${q.section} — السؤال ${toArabicDigits(q.num)}`;
+  questionEl.textContent = q.q;
+  optionsEl.innerHTML = "";
+  q.options.forEach((opt, i) => {
+    const label = document.createElement("label");
+    label.className = "option";
+    label.innerHTML = `<input type="radio" name="answer" value="${i}" ${answers[current]===i ? "checked":""}><span class="option-text">${String.fromCharCode(1575+i)}. ${opt}</span>`;
+    label.querySelector("input").addEventListener("change", e => {
+      answers[current] = Number(e.target.value);
+    });
+    optionsEl.appendChild(label);
+  });
+
+  progressText.textContent = `السؤال ${toArabicDigits(current+1)} من ${toArabicDigits(questions.length)}`;
+  progressBar.style.width = `${((current+1)/questions.length)*100}%`;
+  prevBtn.disabled = current === 0;
+  prevBtn.style.opacity = current === 0 ? ".5" : "1";
+  nextBtn.classList.toggle("hidden", current === questions.length-1);
+  finishBtn.classList.toggle("hidden", current !== questions.length-1);
+}
+
+function saveCurrentFromDOM() {
+  const checked = document.querySelector('input[name="answer"]:checked');
+  if (checked) answers[current] = Number(checked.value);
+}
+
+prevBtn.addEventListener("click", () => {
+  saveCurrentFromDOM();
+  if (current > 0) { current--; renderQuestion(); window.scrollTo({top:0, behavior:"smooth"}); }
+});
+nextBtn.addEventListener("click", () => {
+  saveCurrentFromDOM();
+  if (current < questions.length-1) { current++; renderQuestion(); window.scrollTo({top:0, behavior:"smooth"}); }
+});
+finishBtn.addEventListener("click", () => {
+  saveCurrentFromDOM();
+  const blank = answers.filter(x => x === null).length;
+  if (blank > 0 && !confirm(`توجد ${toArabicDigits(blank)} أسئلة غير مُجاب عنها. هل تريد إنهاء الاختبار؟`)) return;
+  finishQuiz();
+});
+
+function finishQuiz() {
+  clearInterval(timerInterval);
+  let correct = 0;
+  questions.forEach((q,i) => { if (answers[i] === q.answer) correct++; });
+  const wrong = questions.length - correct - answers.filter(x => x === null).length;
+  const blank = answers.filter(x => x === null).length;
+  const pct = Math.round(correct / questions.length * 100);
+  document.getElementById("score").textContent = toArabicDigits(pct) + "%";
+  document.getElementById("correctCount").textContent = toArabicDigits(correct);
+  document.getElementById("wrongCount").textContent = toArabicDigits(wrong);
+  document.getElementById("blankCount").textContent = toArabicDigits(blank);
+  const msg = pct >= 90 ? "مُمْتَازٌ جِدًّا 🌟" : pct >= 75 ? "جَيِّدٌ جِدًّا 👍" : pct >= 60 ? "جَيِّدٌ، وَلَكِنْ يَحْتَاجُ إِلَى مُرَاجَعَةٍ." : "تَحْتَاجُ إِلَى مُرَاجَعَةِ الدُّرُوسِ مَرَّةً أُخْرَى.";
+  document.getElementById("resultMessage").textContent = msg;
+  const reviewList = document.getElementById("reviewList");
+  reviewList.innerHTML = "";
+  questions.forEach((q,i) => {
+    if (answers[i] !== q.answer) {
+      const item = document.createElement("div");
+      item.className = "review-item " + (answers[i] === null ? "wrong" : "wrong");
+      const chosen = answers[i] === null ? "لَمْ تُجَبْ" : q.options[answers[i]];
+      const right = q.options[q.answer];
+      item.innerHTML = `<div><b>السؤال ${toArabicDigits(q.num)}</b></div>
+      <div style="margin:8px 0;line-height:1.8">${q.q}</div>
+      <div>إجابتك: <b>${chosen}</b></div>
+      <div style="color:var(--good);margin-top:5px">الإجابة الصحيحة: <b>${right}</b></div>`;
+      reviewList.appendChild(item);
+    }
+  });
+  quizCard.classList.add("hidden");
+  resultCard.classList.remove("hidden");
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+function restartQuiz() {
+  answers = Array(questions.length).fill(null);
+  current = 0;
+  startedAt = Date.now();
+  resultCard.classList.add("hidden");
+  quizCard.classList.remove("hidden");
+  renderQuestion();
+  startTimer();
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    const sec = Math.floor((Date.now()-startedAt)/1000);
+    const mm = Math.floor(sec/60).toString().padStart(2,"0");
+    const ss = (sec%60).toString().padStart(2,"0");
+    document.getElementById("timer").textContent = `الوقت: ${toArabicDigits(mm)}:${toArabicDigits(ss)}`;
+  }, 1000);
+}
+
+renderQuestion();
+startTimer();
+</script>
+</body>
+</html>
