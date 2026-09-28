@@ -47,6 +47,9 @@ button{border:0;border-radius:12px;padding:12px 18px;font-weight:700;font-size:1
 .review-item.correct{border-right:5px solid var(--good)}
 .review-item.wrong{border-right:5px solid var(--bad)}
 .small{font-size:14px;color:var(--muted)}
+.input-name{width:100%;box-sizing:border-box;padding:14px 16px;font-size:16px;border:1.5px solid var(--border);border-radius:12px;outline:none;font-family:inherit;transition:border-color .2s,box-shadow .2s;background:#fff;color:var(--text);margin-top:8px}
+.input-name:focus{border-color:var(--primary2);box-shadow:0 0 0 4px rgba(37,99,235,.15)}
+.student-tag{display:inline-flex;align-items:center;gap:6px;font-weight:700;color:#1e3a8a;background:#e0e7ff;padding:8px 14px;border-radius:10px;font-size:14px}
 footer{padding:30px 0 50px;color:var(--muted);font-size:13px;text-align:center}
 @media(max-width:700px){
  h1{font-size:24px} .question{font-size:20px} .option-text{font-size:16px}
@@ -62,8 +65,9 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:13px;text-align:center}
   </div>
 </header>
 
-<div class="topbar">
+<div class="topbar hidden" id="topbar">
   <div class="container topbar-inner">
+    <div id="studentTag" class="student-tag">👤 <span id="studentNavName"></span></div>
     <div class="progress-wrap">
       <div class="progress-text" id="progressText">السؤال ١ من ١٠٠</div>
       <div class="progress"><div id="progressBar"></div></div>
@@ -73,7 +77,26 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:13px;text-align:center}
 </div>
 
 <main class="container">
-  <section id="quizCard" class="card">
+  <section id="startCard" class="card" style="max-width:620px;margin:32px auto;text-align:center">
+    <div class="badge">بَيَانَاتُ الطَّالِبِ / IDENTITAS SISWA</div>
+    <h2 style="margin:12px 0 8px;font-size:26px">مَرْحَبًا بِكُمْ فِي اخْتِبَارِ التَّجْرِبَةِ</h2>
+    <p class="small" style="font-size:15px;margin-bottom:24px;line-height:1.7">
+      الرَّجَاءُ إِدْخَالُ اسْمِ الطَّالِبِ قَبْلَ بَدْءِ الْإِجَابَةِ عَنِ الْأَسْئِلَةِ.<br>
+      <span style="direction:ltr;display:inline-block">(Silakan masukkan nama siswa sebelum memulai ujian)</span>
+    </p>
+    
+    <div style="text-align:right;margin-bottom:22px">
+      <label for="studentNameInput" style="display:block;font-weight:700;font-size:15px">اسْمُ الطَّالِبِ (Nama Siswa):</label>
+      <input type="text" id="studentNameInput" class="input-name" placeholder="اكتب اسمك الكامل هنا / Masukkan nama lengkap..." autocomplete="name" autofocus>
+      <div id="nameError" class="small hidden" style="color:var(--bad);margin-top:6px;font-weight:600">⚠️ يُرْجَى إِدْخَالُ اسْمِ الطَّالِبِ أَوَّلًا (Harap masukkan nama siswa terlebih dahulu).</div>
+    </div>
+
+    <button id="startBtn" class="btn-primary" style="width:100%;padding:14px;font-size:16px">
+      بَدْءُ الِاخْتِبَارِ (Mulai Ujian) 🚀
+    </button>
+  </section>
+
+  <section id="quizCard" class="card hidden">
     <div id="badge" class="badge"></div>
     <h2 id="question" class="question"></h2>
     <div id="options"></div>
@@ -90,6 +113,7 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:13px;text-align:center}
   <section id="resultCard" class="card result hidden">
     <div class="badge">النَّتِيجَةُ النِّهَائِيَّةُ</div>
     <h2>أَحْسَنْتَ! أَتْمَمْتَ الِاخْتِبَارَ.</h2>
+    <div id="resultStudent" style="font-size:20px;font-weight:700;margin:12px 0;color:#1e3a8a"></div>
     <div class="score" id="score">0%</div>
     <div class="result-grid">
       <div class="stat"><span>الإجابات الصحيحة</span><b id="correctCount">0</b></div>
@@ -101,7 +125,10 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:13px;text-align:center}
       <h3>مُرَاجَعَةُ الْأَسْئِلَةِ الْخَاطِئَةِ وَغَيْرِ الْمُجَابَةِ</h3>
       <div id="reviewList"></div>
     </div>
-    <button onclick="restartQuiz()" class="btn-primary" style="margin-top:16px">إعادة الاختبار</button>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px">
+      <button onclick="restartQuiz()" class="btn-primary">إعادة الاختبار (Ulangi Ujian)</button>
+      <button onclick="changeStudent()" class="btn-secondary">تَغْيِيرُ اسْمِ الطَّالِبِ (Ganti Siswa)</button>
+    </div>
   </section>
 </main>
 
@@ -115,8 +142,16 @@ let current = 0;
 let answers = Array(questions.length).fill(null);
 let startedAt = Date.now();
 let timerInterval = null;
+let studentName = "";
 
 const toArabicDigits = s => String(s).replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[d]);
+const startCard = document.getElementById("startCard");
+const studentNameInput = document.getElementById("studentNameInput");
+const nameError = document.getElementById("nameError");
+const startBtn = document.getElementById("startBtn");
+const topbar = document.getElementById("topbar");
+const studentNavName = document.getElementById("studentNavName");
+const resultStudent = document.getElementById("resultStudent");
 const progressText = document.getElementById("progressText");
 const progressBar = document.getElementById("progressBar");
 const badge = document.getElementById("badge");
@@ -178,6 +213,7 @@ function finishQuiz() {
   const wrong = questions.length - correct - answers.filter(x => x === null).length;
   const blank = answers.filter(x => x === null).length;
   const pct = Math.round(correct / questions.length * 100);
+  resultStudent.innerHTML = `👤 اسْمُ الطَّالِبِ (Nama Siswa): <span style="color:var(--primary)">${studentName}</span>`;
   document.getElementById("score").textContent = toArabicDigits(pct) + "%";
   document.getElementById("correctCount").textContent = toArabicDigits(correct);
   document.getElementById("wrongCount").textContent = toArabicDigits(wrong);
@@ -204,6 +240,35 @@ function finishQuiz() {
   window.scrollTo({top:0, behavior:"smooth"});
 }
 
+function startQuiz() {
+  const name = studentNameInput.value.trim();
+  if (!name) {
+    nameError.classList.remove("hidden");
+    studentNameInput.focus();
+    return;
+  }
+  nameError.classList.add("hidden");
+  studentName = name;
+  studentNavName.textContent = studentName;
+
+  startCard.classList.add("hidden");
+  topbar.classList.remove("hidden");
+  quizCard.classList.remove("hidden");
+
+  startedAt = Date.now();
+  renderQuestion();
+  startTimer();
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+startBtn.addEventListener("click", startQuiz);
+studentNameInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") startQuiz();
+});
+studentNameInput.addEventListener("input", () => {
+  if (studentNameInput.value.trim()) nameError.classList.add("hidden");
+});
+
 function restartQuiz() {
   answers = Array(questions.length).fill(null);
   current = 0;
@@ -212,6 +277,19 @@ function restartQuiz() {
   quizCard.classList.remove("hidden");
   renderQuestion();
   startTimer();
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+function changeStudent() {
+  answers = Array(questions.length).fill(null);
+  current = 0;
+  clearInterval(timerInterval);
+  resultCard.classList.add("hidden");
+  quizCard.classList.add("hidden");
+  topbar.classList.add("hidden");
+  startCard.classList.remove("hidden");
+  studentNameInput.value = "";
+  setTimeout(() => studentNameInput.focus(), 100);
   window.scrollTo({top:0, behavior:"smooth"});
 }
 
@@ -225,8 +303,7 @@ function startTimer() {
   }, 1000);
 }
 
-renderQuestion();
-startTimer();
+studentNameInput.focus();
 </script>
 </body>
 </html>
